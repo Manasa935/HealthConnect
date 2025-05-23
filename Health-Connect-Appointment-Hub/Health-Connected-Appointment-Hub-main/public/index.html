@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Connect Appointment Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1 class="heading">Health Connect Appointment Hub</h1>
+    <nav>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+        <a href="help.html">Help</a>
+        <a href="contact.html">Contact</a>
+        <a href="ambulance.html">Ambulance Services</a>
+    </nav>
+</header>
+
+<main>
+  <div class="container">
+    <h1>Welcome to Health Connect Appointment Hub</h1>
+    <div class="search">
+      <input type="text" id="search" placeholder="Search hospitals...">
+      <button onclick="searchHospitals()">Search</button> <!-- Added search button -->
+    </div>
+    <div class="buttons">
+      <button onclick="location.href='/hospitals.html'">View Hospitals</button>
+      <button onclick="location.href='/doctors.html'">Book Appointment</button>
+      <button id="logoutBtn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    // Show/hide logout button based on login status
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (localStorage.getItem('userId')) {
+      logoutBtn.style.display = 'block';
+    } else {
+      logoutBtn.style.display = 'none';
+    }
+
+    function logout() {
+      localStorage.removeItem('userId');
+      alert('You have been logged out.');
+      window.location.href = '/login.html';
+    }
+
+    // Search hospitals and redirect to hospitals.html
+    function searchHospitals() {
+      const searchTerm = document.getElementById('search').value.trim();
+      if (searchTerm) {
+        window.location.href = `/hospitals.html?search=${encodeURIComponent(searchTerm)}`;
+      } else {
+        window.location.href = '/hospitals.html';
+      }
+    }
+
+    // Allow Enter key to trigger search
+    document.getElementById('search').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        searchHospitals();
+      }
+    });
+  </script>
+</main>
+
+<footer>
+    <p>© 2025 Health Connect Appointment Hub. All rights reserved.</p>
+    <p class="#link"><a href="privacy.html">Privacy Policy</a> |
+       <a href="terms.html">Terms of Service</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333; /* Dark text color for contrast */
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: blue; /* Darker blue for the header */
+        }
+        .hospital-list {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #ffffff; /* White background for the list */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .hospital-item {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #2c3e50; /* Border color */
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .hospital-item:hover {
+            background-color: #e0f7fa; /* Light cyan on hover */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Hospitals List</h1>
+    <div class="hospital-list" id="hospitalList">
+        <!-- Hospitals will be dynamically loaded here -->
+    </div>
+    <div style="text-align: center;">
+        <button onclick="location.href='/index.html'">Back</button>
+    </div>
+
+    <script>
+        // Get search query from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search') || '';
+
+        // Fetch hospitals based on search query
+        fetch(`/hospitals?search=${encodeURIComponent(searchQuery)}`)
+            .then(res => res.json())
+            .then(hospitals => {
+                const list = document.getElementById('hospitalList');
+                if (hospitals.length === 0) {
+                    list.innerHTML = '<p>No hospitals found.</p>';
+                    return;
+                }
+                hospitals.forEach(h => {
+                    const div = document.createElement('div');
+                    div.className = 'hospital-item';
+                    div.textContent = h.name;
+                    div.onclick = () => {
+                        window.location.href = `/doctors.html?hospital=${encodeURIComponent(h.name)}`;
+                    };
+                    list.appendChild(div);
+                });
+            })
+            .catch(err => {
+                console.error('Error fetching hospitals:', err);
+                document.getElementById('hospitalList').innerHTML = '<p>Error loading hospitals.</p>';
+            });
+    </script>
+
+</body>
+</html>

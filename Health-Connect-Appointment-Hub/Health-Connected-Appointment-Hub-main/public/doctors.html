@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Doctors - Health Connect</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .doctor { border: 1px solid #ddd; padding: 10px; margin: 10px; border-radius: 4px; }
+    .slot-btn { margin: 5px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .slot-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="container-doctors">
+    <h1 class="book">Book an Appointment</h1>
+    <div id="doctorList"></div>
+    <button onclick="location.href='/hospitals.html'">Back</button>
+  </div>
+
+  <script>
+    // Redirect to login if not logged in
+    if (!localStorage.getItem('userId')) {
+      alert('Please log in to book an appointment.');
+      window.location.href = '/login.html';
+    }
+
+    // Get hospital name from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const hospitalName = urlParams.get('hospital') || '';
+
+    // Fetch doctors for the selected hospital
+    fetch(`/doctors?hospital=${encodeURIComponent(hospitalName)}`)
+      .then(res => res.json())
+      .then(doctors => {
+        const list = document.getElementById('doctorList');
+        if (doctors.length === 0) {
+          list.innerHTML = '<p>No doctors available for this hospital.</p>';
+          return;
+        }
+        doctors.forEach(d => {
+          let slots = d.slots.map(s => 
+            `<button class="slot-btn" ${s.available ? '' : 'disabled'} onclick="book('${d._id}', '${s.date}', '${s.time}')">${s.date} ${s.time} (${s.available ? 'Available' : 'Booked'})</button>`
+          ).join('');
+          list.innerHTML += `<div class="doctor"><h3>${d.name} (${d.specialty})</h3>${slots}</div>`;
+        });
+      })
+      .catch(err => {
+        console.error('Error fetching doctors:', err);
+        document.getElementById('doctorList').innerHTML = '<p>Error loading doctors.</p>';
+      });
+
+    // Book appointment function
+    function book(doctorId, date, time) {
+      const userId = localStorage.getItem('userId');
+      fetch('/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, doctorId, date, time }),
+      })
+        .then(res => res.text())
+        .then(message => {
+          alert(message);
+          if (message.includes('successfully')) {
+            location.reload(); // Refresh to show updated slots
+          }
+        })
+        .catch(err => alert('Error booking appointment'));
+    }
+  </script>
+</body>
+</html>
